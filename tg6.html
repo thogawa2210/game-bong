@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+
+<head>
+</head>
+
+<body>
+    
+<script src="https://zimjs.org/cdn/1.3.4/createjs.js"></script>
+<script src="https://zimjs.org/cdn/game_2.5.js"></script>
+<script src="https://zimjs.org/cdn/Box2dWeb-2.1.a.3.min.js"></script>
+<script src="https://zimjs.org/cdn/physics_2.1.js"></script>
+<div style="width:400px; margin:0 auto;" id="zimBase">&nbsp;</div>
+
+<script> 
+import zim from "https://zimjs.org/cdn/015/zim
+const asset = ['img%2FsoccerBall.png?alt=media&token=126de779-d676-4180-a38c-883fb9a9e135'];
+const path = "https://firebasestorage.googleapis.com/v0/b/webgame-786ab.appspot.com/o/";
+
+const frame = new Frame( { 
+	scaling:'zimBase', 
+	width:340,  
+	height:680,  
+	assets:asset,
+	path:path,
+	color:light
+}); 
+
+frame.on("ready", () => { 
+	const stage = frame.stage; 
+	let stageW = frame.width; 
+	let stageH = frame.height;
+
+	const drp = new Container().addTo(stage);
+
+	const scorer = new Scorer().pos(10,50,true).addTo(drp);
+
+	const physics = new Physics();
+	    
+	const ball = new Circle(30, "blue")
+		.sca(1)
+		.centerReg(stage)
+		.addPhysics({shape:'circle', restitution:.7})
+
+	ball.on("mousedown", e=>{
+		ball.impulse(
+		(ball.x-e.stageX/stage.scaleX)*15,
+		(ball.y-e.stageY/stage.scaleY)*15
+		)
+	});
+
+	new Pic("img%2FsoccerBall.png?alt=media&token=126de779-d676-4180-a38c-883fb9a9e135").center()
+
+	ball2.on("mousedown", e=>{
+		ball2.impulse(
+		(ball2.x-e.stageX/stage.scaleX)*15,
+		(ball2.y-e.stageY/stage.scaleY)*15
+		)
+	});
+
+	const ball3 = new Circle(20, "yellow")
+		.center(stage)
+		.pos(null, 630, null, true)
+
+	ball3.on("mousedown", e=>{
+		ball3.addPhysics({shape:'circle', restitution:.7})
+		.contact((obj)=>{
+			if(obj == ball2)	{
+				//ball3.visible = false;
+				scorer.score += 1
+				ball2.siz(100)
+				//ball2.removeFrom()
+			}
+		})
+	});
+
+	new MotionController(ball3, "keydown", 7, "horizontal");
+
+	stage.update(); 
+})
+</script>
+</body>
+</html>

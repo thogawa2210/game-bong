@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8" />
+<title>KB Buddy Game</title>
+
+<script type=module>
+
+//import zim from "https://zimjs.org/cdn/015/zim";
+//import zim from "https://zimjs.com/cdn/015/zim_game";
+import zim from "https://zimjs.com/cdn/015/zim_physics";
+
+const INITBALL = ["./10-CTG.png", "./9-VPB.png", "./8-VNM.png", "./bomb.png", "./logo.png" ];
+const INITBALLSZ = [0.04, 0.08, 0.15, 0.3, 0.3];
+const INITBALLPOS = [630, 630, 615, 630, 630];
+
+const BALL = ["./10-CTG.png", "./9-VPB.png", "./8-VNM.png", "./7-ACV.png", "./6-HPG.png", "./5-VIC.png", "./4-VHM.png", "./3-GAS.png", "./2-BID.png", "./1-VCB.png"];
+const BALLSZ = [0.04, 0.08, 0.15, 0.15, 0.23, 0.21, 0.24, 0.29, 0.30, 0.34];
+const MaxLives = 12;
+
+const frame = new Frame(FIT, 340, 680, light, dark, ready);
+var ON = 0;
+
+function MakeBall(stage, scorer, lives, x, y, init) {
+	var initball
+	var ball
+	if(x == undefined)	{
+		const randomNum = Math.floor(Math.random()*101);
+		if(randomNum < 2)		// 2%
+			initball = 5
+		else if(randomNum < 10)		// 8%
+			initball = 4
+		else if(randomNum < 25)		// 15%
+			initball = 3
+		else if(randomNum < 50)		// 25%
+			initball = 2
+		else 				// 50%
+			initball = 1
+		//initball = Math.floor(Math.random()*3+1);
+        	ball = new Pic(INITBALL[initball-1])
+			.sca(INITBALLSZ[initball-1])
+			.center(stage)
+			.pos(null, INITBALLPOS[initball-1], "center", "bottom");
+		ON = 0;
+		var bd;
+		if(initball == 1)	{
+			bd = new Boundary(0, 0, 315, 0);
+		}
+		else if(initball == 2 || initball == 5)	{
+			bd = new Boundary(0, 0, 303, 0);
+		}
+		else if(initball == 4)	{
+			bd = new Boundary(0, 0, 303, 0);
+		}
+		else	{
+			bd = new Boundary(0, 0, 290, 0);
+		}
+
+		var motion = new MotionController(ball, "pressdrag", 7, "horizontal", bd);
+		ball.on("click", e=>{
+			motion.dispose();
+			ball.addPhysics({shape:'circle', restitution:.7})
+			.centerReg(stage)
+			.contact((obj)=>{
+				if((obj.type == "Pic" && obj.file == INITBALL[initball-1]) || (obj.type == "Pic" && obj.file == INITBALL[4]))        {
+					scorer.score += 1
+					if(scorer.score%2 == 0 || (obj.type == "Pic" && obj.file == INITBALL[4]))	{
+						const x = obj.x
+						const y = obj.y
+						if(lives.selectedIndex < MaxLives)
+							lives.selectedIndex += 1;
+						if(obj.type == "Pic" && obj.file == INITBALL[4])        {		// logo
+							scorer.score += 10;
+							lives.selectedIndex = MaxLives;
+						}
+						obj.removeFrom()
+						MakeBall(stage, scorer, lives, x, y, initball)
+
+					}
+					else
+						obj.removeFrom()
+				}else if((obj.type == "Pic" && initball == 4))	{
+					const emitter = new Emitter({obj:new Rectangle(10,10, red), startPaused:true})
+					emitter.center(stage).loc(obj).spurt(10);
+					obj.removeFrom()
+				}
+			});
+			if(initball != 4)
+				lives.selectedIndex -= 1;
+			if(lives.selectedIndex < 0)	{
+				timeout(2, ()=>{
+					if(lives.selectedIndex < 0){
+						const pane = new Pane({
+							modal:false,
+							backgroundColor:yellow,
+							content: new Label({color:black, text:"Game Over", size:30, bold:true})
+							});
+							const restart = new Button(200, 100, "Restart", purple).sca(0.4).pos(null, 115, "center", "top", pane);
+							restart.on("click", ()=>{zgo("http://10.100.30.105/test/tg8.html")});
+							pane.show();
+					}else	{
+						ON = 1;
+					}
+				});
+			}else	{
+				ON = 1;
+			}
+		}, null, true);		// once : true
+	}else	{
+        	ball = new Pic(BALL[init])
+			.sca(BALLSZ[init])
+			.pos(x, y-30, "left", "top")
+
+		ball.on("ready", e=>{
+			ball.addPhysics({shape:'circle', restitution:.7})
+			.centerReg(stage)
+			.contact((obj)=>{
+				if((obj.type == "Pic" && obj.file == BALL[init]) || (obj.type == "Pic" && obj.file == INITBALL[4]))        {
+					scorer.score += 1
+					if(scorer.score%2 == 0 || (obj.type == "Pic" && obj.file == INITBALL[4]))	{
+					        if(obj.type == "Pic" && obj.file == INITBALL[4])        {               // logo
+                                                        scorer.score += 10;
+                                                        lives.selectedIndex = MaxLives;
+                                                }
+						const x = obj.x
+						const y = obj.y
+						if(init+1 == 10)	{
+							const pane2 = new Pane({
+								width:320,
+								modal:false,
+								backgroundColor:white,
+								content: new Label({color:blue, text:"You Completed!! Game Over", size:20, bold:true})
+								});
+								const restart = new Button(200, 100, "Restart", black).sca(0.4).pos(null, 110, "center", "top", pane2);
+								restart.on("click", ()=>{zgo("http://10.100.30.105/test/tg8.html")});
+								pane2.show();
+							ON = 0;
+						}else	{
+							if(lives.selectedIndex < MaxLives)	{
+								if(init < 3)
+									lives.selectedIndex += 1;
+								else
+									lives.selectedIndex += init+1-2;
+								if(lives.selectedIndex > MaxLives)
+									lives.selectedIndex = MaxLives;
+							}
+							obj.removeFrom()
+							MakeBall(stage, scorer, lives, x, y, init+1)
+						}
+
+					}
+					else
+						obj.removeFrom()
+				}else if((obj.type == "Pic" && obj.file == INITBALL[3]))	{
+					obj.removeFrom()
+				}
+			});
+
+		});
+	}
+}
+
+function ready() {
+        const stage = frame.stage;
+        let stageW = frame.width;
+        let stageH = frame.height;
+	var Ball = [];
+    
+        const drp = new Container().addTo(stage);
+
+        const scorer = new Scorer().sca(0.5).pos(260,50,"left", "top").addTo(drp);
+
+	const lives = new Indicator({
+		num:MaxLives,
+		indicatorType:new Emoji("\u26a1\ufe0f"),
+		fill:true,
+		interactive:false,
+		width:440,
+		selectedIndex:MaxLives
+	}).sca(0.8).pos(null, 90, "center", "top");
+
+	const physics = new Physics();
+
+	MakeBall(stage, scorer, lives)
+	interval(1, ()=>{
+		if(ON == 1){
+			MakeBall(stage, scorer, lives)
+		}
+	})
+
+	/*
+	Ticker.add(()=>{
+		drp.loop( circle=>{
+		if(ball.hitTestCircle(circle)) circle.removeFrom();
+	}, true)
+	*/
+
+	stage.update();
+}
+
+</script>
+</head>
+<body>
+</body>
+</html>
