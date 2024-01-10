@@ -1,19 +1,16 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
-    <meta charset="utf-8" />
-    <title>KB Buddy Game</title>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
 
-    <style>
-      canvas {
-        background: url("./back-ground.png") no-repeat center center fixed; /* Set background image and properties for the canvas */
-        background-size: cover; /* Cover the entire background */
-      }
-    </style>
-
-    <script type="module">
-      import zim from "https://zimjs.com/cdn/015/zim_physics";
-
+    <script type="text/javascript" src="./createjs/createjs.min.js"></script>
+    <script type="text/javascript" src="./zim/zim.min.js"></script>
+    <script type="text/javascript" src="./zim/zim_game.js"></script>
+    <script type="text/javascript" src="./zim/box2d.js"></script>
+    <script type="text/javascript" src="./zim/zim_physics.js"></script>
+    <script>
       const INITBALL = [
         "./10-CTG.png",
         "./9-VPB.png",
@@ -41,10 +38,8 @@
       ];
       const MaxLives = 12;
 
-      const frame = new Frame(FIT, 340, 680, light, dark, ready, './back-ground.png');
       var ON = 0;
 
-	  // Tạo bóng
       function MakeBall(stage, scorer, lives, x, y, init) {
         var initball;
         var ball;
@@ -223,23 +218,24 @@
         }
       }
 
+      const frame = new Frame(FIT, 340, 680, light, dark, ready);
+
       function ready() {
-		new Pic("./back-ground.png", 340, 680).center();
-		// Cái này là stage?
+        
         const stage = frame.stage;
         let stageW = frame.width;
         let stageH = frame.height;
         var Ball = [];
+        console.log(stage);
+        
 
         const drp = new Container().addTo(stage);
 
-		// Điểm số?
         const scorer = new Scorer()
           .sca(0.5)
           .pos(260, 50, "left", "top")
           .addTo(drp);
 
-		// Mạng?
         const lives = new Indicator({
           num: MaxLives,
           indicatorType: new Emoji("\u26a1\ufe0f"),
@@ -251,6 +247,7 @@
           .sca(0.8)
           .pos(null, 90, "center", "top");
 
+        //   console.log("arebvaebaerbaerb");
         const physics = new Physics();
 
         MakeBall(stage, scorer, lives);
@@ -259,8 +256,11 @@
             MakeBall(stage, scorer, lives);
           }
         });
+
         stage.update();
       }
+    
+      ready();
     </script>
   </head>
   <body></body>
