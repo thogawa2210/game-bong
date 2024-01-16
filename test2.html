@@ -4,12 +4,10 @@
     <meta charset="utf-8" />
     <title>KB Buddy Game</title>
 
-    <style>
-      canvas {
-        background: url("./back-ground.png") no-repeat center center fixed; /* Set background image and properties for the canvas */
-        background-size: cover; /* Cover the entire background */
-      }
-    </style>
+    <script>
+      const assets = ["back-ground.png"];
+      const path = "/";
+    </script>
 
     <script type="module">
       import zim from "https://zimjs.com/cdn/015/zim_physics";
@@ -45,10 +43,13 @@
         FIT,
         340,
         680,
-        '#FFF0DD',
-        '',
+        "#FFF0DD",
+        "",
         ready,
+        assets,
+        path
       );
+
       var ON = 0;
 
       // Tạo bóng
@@ -95,6 +96,7 @@
             "horizontal",
             bd
           );
+          
           ball.on(
             "click",
             (e) => {
@@ -237,13 +239,13 @@
         let stageH = frame.height;
         var Ball = [];
 
-        const drp = new Container().addTo(stage);
+        const bg = asset("back-ground.png").scaleTo(stage).center();
 
         // Điểm số?
         const scorer = new Scorer()
           .sca(0.5)
           .pos(260, 50, "left", "top")
-          .addTo(drp);
+          .addTo(stage);
 
         // Mạng?
         const lives = new Indicator({
@@ -258,6 +260,12 @@
           .pos(null, 90, "center", "top");
 
         const physics = new Physics();
+
+        const rect = new Rectangle(340, 130)
+          .alp(0)
+          .centerReg()
+          .pos(0, 0, LEFT, BOTTOM)
+          .addPhysics(false);
 
         MakeBall(stage, scorer, lives);
         interval(1, () => {

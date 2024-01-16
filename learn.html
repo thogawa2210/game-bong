@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>ZIM - Code Creativity</title>
+
+    <script>
+      const assets = ["back-ground.png"];
+      const path = "/";
+    </script>
+
+    <!-- zimjs.com - JavaScript Canvas Framework -->
+    <script type="module">
+      import zim from "https://zimjs.com/cdn/015/zim_physics";
+
+      // See Docs under Frame for FIT, FILL, FULL, and TAG
+      const frame = new Frame(FIT, 340, 680, light, dark, ready);
+
+      function ready() {
+        const stage = frame.stage;
+        // const bg = new Pic("back-ground.png").addTo().scaleTo(stage);
+
+        // const circle = new Circle(40, green).center();
+        
+
+        // const rect = new Rectangle(50, 30, green).centerReg();
+        // const controller1 = new MotionController({
+        //   target: rect,
+        //   type: "keydown",
+        //   diagonal: true,
+        //   damp: 0.1,
+        //   rotate: true,
+        // });
+        const bg = new Pic("back-ground.png");
+
+        const cont = new Container(340,680).addTo().outline();
+
+        
+        const ball = new Circle(40, red).center(cont);
+
+        const controller = new MotionController({target: ball, container: cont});
+        
+
+        // control position of ball with MotionController
+        // new MotionController({
+        //   target: ball,
+        //   type: "mousemove",
+        //   // allow press on Scroller backings
+        //   mousedownIncludes: [scroller.backing1, scroller.backing2],
+        //   speed: 10,
+        // });
+      }
+    </script>
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+  </head>
+  <body></body>
+</html>
