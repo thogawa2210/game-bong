@@ -31,14 +31,17 @@
         //   damp: 0.1,
         //   rotate: true,
         // });
-        const bg = new Pic("back-ground.png");
-
-        const cont = new Container(340,680).addTo().outline();
-
+        const bg = new Pic("back-ground.png").scaleTo(stage).addTo();
         
-        const ball = new Circle(40, red).center(cont);
+        const ball = new Circle(40, red).center();
 
-        const controller = new MotionController({target: ball, container: cont});
+        const bd = new Boundary(0, 0, 340, 0);
+
+        const controller = new MotionController({
+            target: ball,
+            type: "mousedown",
+            mousedownIncludes: [bg]
+        });
         
 
         // control position of ball with MotionController

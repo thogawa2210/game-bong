@@ -22,7 +22,7 @@
         "./logo.png",
       ];
       const INITBALLSZ = [0.04, 0.08, 0.15, 0.3, 0.3];
-      const INITBALLPOS = [630, 630, 615, 630, 630];
+      const INITBALLPOS = [580, 580, 565, 580, 580];
 
       const BALL = [
         "./10-CTG.png",
@@ -41,18 +41,12 @@
       ];
       const MaxLives = 12;
 
-      const frame = new Frame(
-        FIT,
-        340,
-        680,
-        '#FFF0DD',
-        '',
-        ready,
-      );
+      const frame = new Frame(FIT, 340, 680, "", "", ready);
+
       var ON = 0;
 
       // Tạo bóng
-      function MakeBall(stage, scorer, lives, x, y, init) {
+      function MakeBall(stage, scorer, lives, bg, x, y, init) {
         var initball;
         var ball;
         if (x == undefined) {
@@ -88,13 +82,14 @@
             bd = new Boundary(0, 0, 290, 0);
           }
 
-          var motion = new MotionController(
-            ball,
-            "pressdrag",
-            7,
-            "horizontal",
-            bd
-          );
+          var motion = new MotionController({
+            target: ball,
+            type: "pressdrag",
+            speed: 7,
+            axis: "horizontal",
+            boundary: bd,
+            mousedownIncludes: bg,
+          });
           ball.on(
             "click",
             (e) => {
@@ -122,7 +117,7 @@
                         lives.selectedIndex = MaxLives;
                       }
                       obj.removeFrom();
-                      MakeBall(stage, scorer, lives, x, y, initball);
+                      MakeBall(stage, scorer, lives, bg, x, y, initball);
                     } else obj.removeFrom();
                   } else if (obj.type == "Pic" && initball == 4) {
                     const emitter = new Emitter({
@@ -137,6 +132,7 @@
               if (lives.selectedIndex < 0) {
                 timeout(2, () => {
                   if (lives.selectedIndex < 0) {
+                    // Bảng thông báo game over
                     const pane = new Pane({
                       modal: false,
                       backgroundColor: yellow,
@@ -147,12 +143,14 @@
                         bold: true,
                       }),
                     });
+
+                    // Nút restart
                     const restart = new Button(200, 100, "Restart", purple)
                       .sca(0.4)
-                      .pos(null, 115, "center", "top", pane);
-                    restart.on("click", () => {
-                      zgo("http://10.100.30.105/test/tg8.html");
-                    });
+                      .pos(null, 115, "center", "top", pane)
+                      .tap(() => {
+                        zgo("http://10.100.30.105/test/tg8.html");
+                      });
                     pane.show();
                   } else {
                     ON = 1;
@@ -205,10 +203,10 @@
                       });
                       const restart = new Button(200, 100, "Restart", black)
                         .sca(0.4)
-                        .pos(null, 110, "center", "top", pane2);
-                      restart.on("click", () => {
-                        zgo("http://10.100.30.105/test/tg8.html");
-                      });
+                        .pos(null, 110, "center", "top", pane2)
+                        .tap(() => {
+                          zgo("http://10.100.30.105/test/tg8.html");
+                        });
                       pane2.show();
                       ON = 0;
                     } else {
@@ -219,7 +217,7 @@
                           lives.selectedIndex = MaxLives;
                       }
                       obj.removeFrom();
-                      MakeBall(stage, scorer, lives, x, y, init + 1);
+                      MakeBall(stage, scorer, lives, bg, x, y, init + 1);
                     }
                   } else obj.removeFrom();
                 } else if (obj.type == "Pic" && obj.file == INITBALL[3]) {
@@ -237,15 +235,9 @@
         let stageH = frame.height;
         var Ball = [];
 
-        asset("back-ground.png").scaleTo(stage).center().ord(-2);
-
-        const drp = new Container().addTo(stage);
+        const bg = new Pic("back-ground.png").scaleTo(stage).center();
 
         // Điểm số?
-        const scorer = new Scorer()
-          .sca(0.5)
-          .pos(260, 50, "left", "top")
-          .addTo(drp);
 
         // Mạng?
         const lives = new Indicator({
@@ -256,15 +248,28 @@
           width: 440,
           selectedIndex: MaxLives,
         })
+          .addTo(stage)
           .sca(0.8)
-          .pos(null, 90, "center", "top");
+          .pos(0, 60, "center", "bottom");
 
-        const physics = new Physics();
+        const rect = new Rectangle(340, 130)
+          .alp(0)
+          .centerReg()
+          .pos(0, 0, LEFT, BOTTOM)
+          .addPhysics(false);
 
-        MakeBall(stage, scorer, lives);
+        const scorer = new Scorer({
+          color: "#95FF6E",
+          backgroundColor: "#3C3934",
+        })
+          .sca(0.5)
+          .pos(0, 20, "center", "bottom")
+          .addTo(stage);
+
+        MakeBall(stage, scorer, lives, bg);
         interval(1, () => {
           if (ON == 1) {
-            MakeBall(stage, scorer, lives);
+            MakeBall(stage, scorer, lives, bg);
           }
         });
         stage.update();
