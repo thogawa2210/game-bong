@@ -39,11 +39,17 @@
       const BALLSZ = [
         0.04, 0.08, 0.15, 0.15, 0.23, 0.21, 0.24, 0.29, 0.3, 0.34,
       ];
-      const MaxLives = 12;
+      const MaxLives = 2;
 
-      const frame = new Frame(FIT, 340, 680, "", "", ready);
-
+      var frame;
+      frame = new Frame(FIT, 340, 680, "", "", ready);
       var ON = 0;
+
+      function restartGame() {
+        // zgo("http://10.100.30.105/test/tg8.html");
+        
+        window.location.reload()
+      }
 
       // Tạo bóng
       function MakeBall(stage, scorer, lives, bg, x, y, init) {
@@ -149,7 +155,7 @@
                       .sca(0.4)
                       .pos(null, 115, "center", "top", pane)
                       .tap(() => {
-                        zgo("http://10.100.30.105/test/tg8.html");
+                        restartGame();
                       });
                     pane.show();
                   } else {
@@ -205,7 +211,7 @@
                         .sca(0.4)
                         .pos(null, 110, "center", "top", pane2)
                         .tap(() => {
-                          zgo("http://10.100.30.105/test/tg8.html");
+                          restartGame();
                         });
                       pane2.show();
                       ON = 0;
@@ -231,15 +237,10 @@
       function ready() {
         // Cái này là stage?
         const stage = frame.stage;
-        let stageW = frame.width;
-        let stageH = frame.height;
-        var Ball = [];
 
         const bg = new Pic("back-ground.png").scaleTo(stage).center();
 
-        // Điểm số?
-
-        // Mạng?
+        // Mạng
         const lives = new Indicator({
           num: MaxLives,
           indicatorType: new Emoji("\u26a1\ufe0f"),
@@ -252,12 +253,14 @@
           .sca(0.8)
           .pos(0, 60, "center", "bottom");
 
+          // Đáy
         const rect = new Rectangle(340, 130)
           .alp(0)
           .centerReg()
           .pos(0, 0, LEFT, BOTTOM)
           .addPhysics(false);
 
+        // Điểm số
         const scorer = new Scorer({
           color: "#95FF6E",
           backgroundColor: "#3C3934",
