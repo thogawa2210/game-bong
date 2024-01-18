@@ -39,16 +39,24 @@
       const BALLSZ = [
         0.04, 0.08, 0.15, 0.15, 0.23, 0.21, 0.24, 0.29, 0.3, 0.34,
       ];
-      const MaxLives = 2;
+      const MaxLives = 12;
 
       var frame;
       frame = new Frame(FIT, 340, 680, "", "", ready);
       var ON = 0;
 
-      function restartGame() {
-        // zgo("http://10.100.30.105/test/tg8.html");
-        
-        window.location.reload()
+      function restartGame(stage, scorer, lives, bg) {
+        const ballNumber = stage.children.length - 4;
+
+        for (let i = 0; i < ballNumber; i++) {
+          zog(stage.children[i]);
+          stage.children[4].removeFrom();
+        }
+
+        lives.selectedIndex = MaxLives;
+        scorer.score = 0;
+
+        MakeBall(stage, scorer, lives, bg);
       }
 
       // Tạo bóng
@@ -141,21 +149,28 @@
                     // Bảng thông báo game over
                     const pane = new Pane({
                       modal: false,
-                      backgroundColor: yellow,
+                      backgroundColor: white,
                       content: new Label({
-                        color: black,
+                        color: "#8E8C8A",
                         text: "Game Over",
+                        backgroundColor: "#EAEAEA",
                         size: 30,
                         bold: true,
                       }),
                     });
 
                     // Nút restart
-                    const restart = new Button(200, 100, "Restart", purple)
+                    const restart = new Button({
+                      width: 200,
+                      height: 100,
+                      label: "Retry",
+                      backgroundColor: "#EA7C18",
+                      color: white,
+                    })
                       .sca(0.4)
                       .pos(null, 115, "center", "top", pane)
                       .tap(() => {
-                        restartGame();
+                        restartGame(stage, scorer, lives, bg);
                       });
                     pane.show();
                   } else {
@@ -211,7 +226,7 @@
                         .sca(0.4)
                         .pos(null, 110, "center", "top", pane2)
                         .tap(() => {
-                          restartGame();
+                          restartGame(stage, scorer, lives, bg);
                         });
                       pane2.show();
                       ON = 0;
@@ -253,7 +268,7 @@
           .sca(0.8)
           .pos(0, 60, "center", "bottom");
 
-          // Đáy
+        // Đáy
         const rect = new Rectangle(340, 130)
           .alp(0)
           .centerReg()
@@ -264,6 +279,7 @@
         const scorer = new Scorer({
           color: "#95FF6E",
           backgroundColor: "#3C3934",
+          bold: true,
         })
           .sca(0.5)
           .pos(0, 20, "center", "bottom")
@@ -275,7 +291,7 @@
             MakeBall(stage, scorer, lives, bg);
           }
         });
-        stage.update();
+        // stage.update();
       }
     </script>
   </head>

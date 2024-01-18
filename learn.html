@@ -21,7 +21,6 @@
         // const bg = new Pic("back-ground.png").addTo().scaleTo(stage);
 
         // const circle = new Circle(40, green).center();
-        
 
         // const rect = new Rectangle(50, 30, green).centerReg();
         // const controller1 = new MotionController({
@@ -32,26 +31,38 @@
         //   rotate: true,
         // });
         const bg = new Pic("back-ground.png").scaleTo(stage).addTo();
-        
+
         const ball = new Circle(40, red).center();
 
         const bd = new Boundary(0, 0, 340, 0);
 
         const controller = new MotionController({
-            target: ball,
-            type: "mousedown",
-            mousedownIncludes: [bg]
+          target: ball,
+          type: "mousedown",
+          mousedownIncludes: [bg],
         });
-        
 
-        // control position of ball with MotionController
-        // new MotionController({
-        //   target: ball,
-        //   type: "mousemove",
-        //   // allow press on Scroller backings
-        //   mousedownIncludes: [scroller.backing1, scroller.backing2],
-        //   speed: 10,
-        // });
+        const bar = new ProgressBar({
+          barType: "rectangle",
+          corner: 0,
+          autoHide: false,
+        }).show(); // run for 2 seconds
+        bar.percent = 100;
+
+        new Button({
+          width: 200,
+          height: 100,
+          label: "Retry",
+          backgroundColor: "#EA7C18",
+          color: white,
+        })
+          .sca(0.4)
+          .pos(null, 115, "center", "top")
+          .tap(() => {
+            zog("aaaaaaa");
+            bar.percent -= 10;
+            // restartGame(stage, scorer, lives, bg);
+          });
       }
     </script>
     <meta name="viewport" content="width=device-width, user-scalable=no" />
