@@ -37,25 +37,30 @@
       const BALLSZ = [
         0.04, 0.08, 0.15, 0.15, 0.23, 0.21, 0.24, 0.29, 0.3, 0.34,
       ];
-      const MaxLives = 10;
 
       var physics;
 
-      var frame;
-
-      frame = new Frame(FIT, 340, 680, "", "", ready);
+      const frame = new Frame(FIT, 340, 680, "", "", ready);
       var ON = 0;
 
-      function restartGame(stage, scorer, lives, bg) {
-        physics.dispose();
-        frame.dispose();
+      function restartGame(bar, stage, scorer, bg) {
+        const ballNumber = stage.children.length - 4;
+
+        for (let i = 0; i < ballNumber; i++) {
+          stage.children[4].removeFrom();
+        }
+
+        bar.percent = 100;
+        scorer.score = 0;
+
+        MakeBall(bar, stage, scorer, bg);
       }
 
       function back() {
         physics.dispose();
       }
       // Tạo bóng
-      function MakeBall(bar, stage, scorer, lives, bg, x, y, init) {
+      function MakeBall(bar, stage, scorer, bg, x, y, init) {
         var initball;
         var ball;
         if (x == undefined) {
@@ -118,17 +123,17 @@
                     ) {
                       const x = obj.x;
                       const y = obj.y;
-                      if (lives.selectedIndex < MaxLives) {
-                        lives.selectedIndex += 1;
+                      if (bar.percent < 100) {
+                        bar.percent += 10;
                       }
 
                       if (obj.type == "Pic" && obj.file == INITBALL[4]) {
                         // logo
                         scorer.score += 10;
-                        lives.selectedIndex = MaxLives;
+                        bar.percent = 100;
                       }
                       obj.removeFrom();
-                      MakeBall(bar, stage, scorer, lives, bg, x, y, initball);
+                      MakeBall(bar, stage, scorer, bg, x, y, initball);
                     } else obj.removeFrom();
                   } else if (obj.type == "Pic" && initball == 4) {
                     const emitter = new Emitter({
@@ -140,11 +145,11 @@
                   }
                 });
               if (initball != 4) {
-                lives.selectedIndex -= 1;
+                bar.percent -= 10;
               }
-              if (lives.selectedIndex < 0) {
+              if (bar.percent < 0) {
                 timeout(2, () => {
-                  if (lives.selectedIndex < 0) {
+                  if (bar.percent < 10) {
                     // Bảng thông báo game over
                     const pane = new Pane({
                       modal: false,
@@ -169,7 +174,7 @@
                       .sca(0.4)
                       .pos(null, 115, "center", "top", pane)
                       .tap(() => {
-                        restartGame(stage, scorer, lives, bg);
+                        restartGame(bar, stage, scorer, bg);
                       });
                     pane.show();
                   } else {
@@ -205,7 +210,7 @@
                     if (obj.type == "Pic" && obj.file == INITBALL[4]) {
                       // logo
                       scorer.score += 10;
-                      lives.selectedIndex = MaxLives;
+                      bar.percent = 100;
                     }
                     const x = obj.x;
                     const y = obj.y;
@@ -225,23 +230,23 @@
                         .sca(0.4)
                         .pos(null, 110, "center", "top", pane2)
                         .tap(() => {
-                          restartGame(stage, scorer, lives, bg);
+                          restartGame(bar, stage, scorer, bg);
                         });
                       pane2.show();
                       ON = 0;
                     } else {
-                      if (lives.selectedIndex < MaxLives) {
+                      if (bar.percent < 100) {
                         if (init < 3) {
-                          lives.selectedIndex += 1;
+                          bar.percent += 10;
                         } else {
-                          lives.selectedIndex += init + 1 - 2;
+                          bar.percent += init * 10 + 10 - 20;
                         }
-                        if (lives.selectedIndex > MaxLives) {
-                          lives.selectedIndex = MaxLives;
+                        if (bar.percent > 100) {
+                          bar.percent = 100;
                         }
                       }
                       obj.removeFrom();
-                      MakeBall(bar, stage, scorer, lives, bg, x, y, init + 1);
+                      MakeBall(bar, stage, scorer, bg, x, y, init + 1);
                     }
                   } else obj.removeFrom();
                 } else if (obj.type == "Pic" && obj.file == INITBALL[3]) {
@@ -266,20 +271,6 @@
           .pos(15, 8)
           .tap(() => back());
 
-        // Mạng
-        const lives = new Indicator({
-          num: MaxLives,
-          indicatorType: new Emoji("\u26a1\ufe0f"),
-          fill: true,
-          interactive: false,
-          width: 440,
-          selectedIndex: MaxLives,
-        })
-          .addTo(stage)
-          .sca(0.8)
-          .pos(0, 60, "center", "bottom");
-        // .alp(0);
-
         // Đáy
         const rect = new Rectangle(340, 130)
           .alp(0)
@@ -287,6 +278,7 @@
           .pos(0, 0, LEFT, BOTTOM)
           .addPhysics(false);
 
+        // Thanh máu
         var pattern = pizzazz.makePattern({
           type: "slants",
           colors: series(black, grey),
@@ -325,10 +317,10 @@
           .pos(0, 20, "center", "bottom")
           .addTo(stage);
 
-        MakeBall(bar, stage, scorer, lives, bg);
+        MakeBall(bar, stage, scorer, bg);
         interval(1, () => {
           if (ON == 1) {
-            MakeBall(bar, stage, scorer, lives, bg);
+            MakeBall(bar, stage, scorer, bg);
           }
         });
       }
