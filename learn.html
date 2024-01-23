@@ -9,60 +9,43 @@
       const path = "/";
     </script>
 
+    <!-- <script
+      type="module"
+      src="https://zimjs.org/cdn/015/zim_pizzazz.js"
+    ></script> -->
+
     <!-- zimjs.com - JavaScript Canvas Framework -->
     <script type="module">
-      import zim from "https://zimjs.com/cdn/015/zim_physics";
-
+      import zim from "https://zimjs.org/cdn/015/zim_pizzazz.js";
       // See Docs under Frame for FIT, FILL, FULL, and TAG
       const frame = new Frame(FIT, 340, 680, light, dark, ready);
 
       function ready() {
         const stage = frame.stage;
-        // const bg = new Pic("back-ground.png").addTo().scaleTo(stage);
 
-        // const circle = new Circle(40, green).center();
+        // const circle = new Circle().center().drag();
 
-        // const rect = new Rectangle(50, 30, green).centerReg();
-        // const controller1 = new MotionController({
-        //   target: rect,
-        //   type: "keydown",
-        //   diagonal: true,
-        //   damp: 0.1,
-        //   rotate: true,
-        // });
-        const bg = new Pic("back-ground.png").scaleTo(stage).addTo();
-
-        const ball = new Circle(40, red).center();
-
-        const bd = new Boundary(0, 0, 340, 0);
-
-        const controller = new MotionController({
-          target: ball,
-          type: "mousedown",
-          mousedownIncludes: [bg],
+        var pattern = makePattern({
+          type: "slants",
+          colors: series(black, grey),
+          size: 10,
+          rows: 6,
+          cols: 60,
+          interval: 500,
         });
-
-        const bar = new ProgressBar({
-          barType: "rectangle",
-          corner: 0,
-          autoHide: false,
-        }).show(); // run for 2 seconds
-        bar.percent = 100;
-
-        new Button({
-          width: 200,
-          height: 100,
-          label: "Retry",
-          backgroundColor: "#EA7C18",
-          color: white,
+        var bar = new ProgressBar({
+          barType: "Rectangle",
+          backing: pattern,
+          corner: 5,
+          width: 300,
         })
-          .sca(0.4)
-          .pos(null, 115, "center", "top")
-          .tap(() => {
-            zog("aaaaaaa");
-            bar.percent -= 10;
-            // restartGame(stage, scorer, lives, bg);
-          });
+          .sca(0.5)
+          .show()
+          .center();
+
+        bar.percent = 90;
+
+        const barIcon = new Pic("pro/images/game/lives.svg").pos(80, 0, CENTER, CENTER);
       }
     </script>
     <meta name="viewport" content="width=device-width, user-scalable=no" />

@@ -4,63 +4,58 @@
     <meta charset="utf-8" />
     <title>KB Buddy Game</title>
 
-    <style>
-      canvas {
-        background: url("./back-ground.png") no-repeat center center fixed; /* Set background image and properties for the canvas */
-        background-size: cover; /* Cover the entire background */
-      }
-    </style>
+    <script type="text/javascript" src="./zim/createjs.min.js"></script>
+    <script type="text/javascript" src="./zim//zim.min.js"></script>
+    <script type="text/javascript" src="./zim//zim_game.js"></script>
+    <script type="text/javascript" src="./zim//box2d.js"></script>
+    <script type="text/javascript" src="./zim//zim_physics.js"></script>
+    <script type="text/javascript" src="./zim//zim_pizzazz.js"></script>
 
     <script type="module">
-      import zim from "https://zimjs.com/cdn/015/zim_physics";
-
       const INITBALL = [
-        "./10-CTG.png",
-        "./9-VPB.png",
-        "./8-VNM.png",
-        "./bomb.png",
-        "./logo.png",
+        "pro/images/game/10-CTG.png",
+        "pro/images/game/9-VPB.png",
+        "pro/images/game/8-VNM.png",
+        "pro/images/game/bomb.png",
+        "pro/images/game/logo.png",
       ];
       const INITBALLSZ = [0.04, 0.08, 0.15, 0.3, 0.3];
-      const INITBALLPOS = [580, 580, 565, 580, 580];
+      const INITBALLPOS = [570, 570, 555, 570, 570];
 
       const BALL = [
-        "./10-CTG.png",
-        "./9-VPB.png",
-        "./8-VNM.png",
-        "./7-ACV.png",
-        "./6-HPG.png",
-        "./5-VIC.png",
-        "./4-VHM.png",
-        "./3-GAS.png",
-        "./2-BID.png",
-        "./1-VCB.png",
+        "pro/images/game/10-CTG.png",
+        "pro/images/game/9-VPB.png",
+        "pro/images/game/8-VNM.png",
+        "pro/images/game/7-ACV.png",
+        "pro/images/game/6-HPG.png",
+        "pro/images/game/5-VIC.png",
+        "pro/images/game/4-VHM.png",
+        "pro/images/game/3-GAS.png",
+        "pro/images/game/2-BID.png",
+        "pro/images/game/1-VCB.png",
       ];
       const BALLSZ = [
         0.04, 0.08, 0.15, 0.15, 0.23, 0.21, 0.24, 0.29, 0.3, 0.34,
       ];
-      const MaxLives = 12;
+      const MaxLives = 10;
+
+      var physics;
 
       var frame;
+
       frame = new Frame(FIT, 340, 680, "", "", ready);
       var ON = 0;
 
       function restartGame(stage, scorer, lives, bg) {
-        const ballNumber = stage.children.length - 4;
-
-        for (let i = 0; i < ballNumber; i++) {
-          zog(stage.children[i]);
-          stage.children[4].removeFrom();
-        }
-
-        lives.selectedIndex = MaxLives;
-        scorer.score = 0;
-
-        MakeBall(stage, scorer, lives, bg);
+        physics.dispose();
+        frame.dispose();
       }
 
+      function back() {
+        physics.dispose();
+      }
       // Tạo bóng
-      function MakeBall(stage, scorer, lives, bg, x, y, init) {
+      function MakeBall(bar, stage, scorer, lives, bg, x, y, init) {
         var initball;
         var ball;
         if (x == undefined) {
@@ -123,15 +118,17 @@
                     ) {
                       const x = obj.x;
                       const y = obj.y;
-                      if (lives.selectedIndex < MaxLives)
+                      if (lives.selectedIndex < MaxLives) {
                         lives.selectedIndex += 1;
+                      }
+
                       if (obj.type == "Pic" && obj.file == INITBALL[4]) {
                         // logo
                         scorer.score += 10;
                         lives.selectedIndex = MaxLives;
                       }
                       obj.removeFrom();
-                      MakeBall(stage, scorer, lives, bg, x, y, initball);
+                      MakeBall(bar, stage, scorer, lives, bg, x, y, initball);
                     } else obj.removeFrom();
                   } else if (obj.type == "Pic" && initball == 4) {
                     const emitter = new Emitter({
@@ -142,7 +139,9 @@
                     obj.removeFrom();
                   }
                 });
-              if (initball != 4) lives.selectedIndex -= 1;
+              if (initball != 4) {
+                lives.selectedIndex -= 1;
+              }
               if (lives.selectedIndex < 0) {
                 timeout(2, () => {
                   if (lives.selectedIndex < 0) {
@@ -232,13 +231,17 @@
                       ON = 0;
                     } else {
                       if (lives.selectedIndex < MaxLives) {
-                        if (init < 3) lives.selectedIndex += 1;
-                        else lives.selectedIndex += init + 1 - 2;
-                        if (lives.selectedIndex > MaxLives)
+                        if (init < 3) {
+                          lives.selectedIndex += 1;
+                        } else {
+                          lives.selectedIndex += init + 1 - 2;
+                        }
+                        if (lives.selectedIndex > MaxLives) {
                           lives.selectedIndex = MaxLives;
+                        }
                       }
                       obj.removeFrom();
-                      MakeBall(stage, scorer, lives, bg, x, y, init + 1);
+                      MakeBall(bar, stage, scorer, lives, bg, x, y, init + 1);
                     }
                   } else obj.removeFrom();
                 } else if (obj.type == "Pic" && obj.file == INITBALL[3]) {
@@ -253,7 +256,15 @@
         // Cái này là stage?
         const stage = frame.stage;
 
-        const bg = new Pic("back-ground.png").scaleTo(stage).center();
+        physics = new Physics({ frame: frame });
+
+        const bg = new Pic("pro/images/game/back-ground.png")
+          .scaleTo(stage)
+          .center();
+
+        const button = new Pic("pro/images/game/back.png", 40, 40)
+          .pos(15, 8)
+          .tap(() => back());
 
         // Mạng
         const lives = new Indicator({
@@ -267,6 +278,7 @@
           .addTo(stage)
           .sca(0.8)
           .pos(0, 60, "center", "bottom");
+        // .alp(0);
 
         // Đáy
         const rect = new Rectangle(340, 130)
@@ -274,6 +286,34 @@
           .centerReg()
           .pos(0, 0, LEFT, BOTTOM)
           .addPhysics(false);
+
+        var pattern = pizzazz.makePattern({
+          type: "slants",
+          colors: series(black, grey),
+          size: 10,
+          rows: 6,
+          cols: 60,
+          interval: 500,
+        });
+        var bar = new ProgressBar({
+          barType: "Rectangle",
+          backing: pattern,
+          corner: 5,
+          width: 300,
+          autoHide: false,
+        })
+          .sca(0.5)
+          .show()
+          .pos(0, 65, "center", "bottom");
+
+        bar.percent = 100;
+
+        const barIcon = new Pic("pro/images/game/lives.svg").pos(
+          80,
+          55,
+          CENTER,
+          BOTTOM
+        );
 
         // Điểm số
         const scorer = new Scorer({
@@ -285,13 +325,12 @@
           .pos(0, 20, "center", "bottom")
           .addTo(stage);
 
-        MakeBall(stage, scorer, lives, bg);
+        MakeBall(bar, stage, scorer, lives, bg);
         interval(1, () => {
           if (ON == 1) {
-            MakeBall(stage, scorer, lives, bg);
+            MakeBall(bar, stage, scorer, lives, bg);
           }
         });
-        // stage.update();
       }
     </script>
   </head>
