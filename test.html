@@ -44,10 +44,11 @@
       var ON = 0;
 
       function restartGame(bar, stage, scorer, bg) {
-        const ballNumber = stage.children.length - 4;
+        zog(stage.children);
+        const ballNumber = stage.children.length - 6;
 
         for (let i = 0; i < ballNumber; i++) {
-          stage.children[4].removeFrom();
+          stage.children[6].removeFrom();
         }
 
         bar.percent = 100;
@@ -99,7 +100,7 @@
           var motion = new MotionController({
             target: ball,
             type: "pressdrag",
-            speed: 7,
+            speed: 20,
             axis: "horizontal",
             boundary: bd,
             mousedownIncludes: bg,
@@ -113,28 +114,36 @@
                 .centerReg(stage)
                 .contact((obj) => {
                   if (
+                    // Nếu chạm với quả giống mình hoặc quả logo
                     (obj.type == "Pic" && obj.file == INITBALL[initball - 1]) ||
                     (obj.type == "Pic" && obj.file == INITBALL[4])
                   ) {
+                    // Điểm cộng 1
                     scorer.score += 1;
                     if (
+                      // Nếu điểm chẵn hoặc chạm quả logo
                       scorer.score % 2 == 0 ||
                       (obj.type == "Pic" && obj.file == INITBALL[4])
                     ) {
                       const x = obj.x;
                       const y = obj.y;
                       if (bar.percent < 100) {
+                        // Cộng thêm máu nếu máu ko đầy
                         bar.percent += 10;
                       }
 
+                      // Logic đặc biệt khi chạm quả logo
                       if (obj.type == "Pic" && obj.file == INITBALL[4]) {
                         // logo
                         scorer.score += 10;
                         bar.percent = 100;
                       }
+                      // Xoá cái chạm vào
                       obj.removeFrom();
+                      // Tạo quả bóng mới to hơn quả cũ nè
                       MakeBall(bar, stage, scorer, bg, x, y, initball);
                     } else obj.removeFrom();
+                    // Logic bombs: Nếu mình là bom và quả kia là Pic
                   } else if (obj.type == "Pic" && initball == 4) {
                     const emitter = new Emitter({
                       obj: new Rectangle(10, 10, red),
@@ -147,7 +156,7 @@
               if (initball != 4) {
                 bar.percent -= 10;
               }
-              if (bar.percent < 0) {
+              if (bar.percent < 10) {
                 timeout(2, () => {
                   if (bar.percent < 10) {
                     // Bảng thông báo game over
@@ -189,6 +198,7 @@
             true
           ); // once : true
         } else {
+          // Logic tạo bóng mới to hơn khi đã chạm nhau
           ball = new Pic(BALL[init])
             .sca(BALLSZ[init])
             .pos(x, y - 30, "left", "top");
@@ -214,6 +224,7 @@
                     }
                     const x = obj.x;
                     const y = obj.y;
+                    // Thắng game khi có quả to hơn VCB
                     if (init + 1 == 10) {
                       const pane2 = new Pane({
                         width: 320,
@@ -249,6 +260,7 @@
                       MakeBall(bar, stage, scorer, bg, x, y, init + 1);
                     }
                   } else obj.removeFrom();
+                  // Quả khác là bomb thì remove bomb
                 } else if (obj.type == "Pic" && obj.file == INITBALL[3]) {
                   obj.removeFrom();
                 }
@@ -261,12 +273,15 @@
         // Cái này là stage?
         const stage = frame.stage;
 
+        // Tạo physics để lát sau xoá khi hết màn
         physics = new Physics({ frame: frame });
 
+        // Background
         const bg = new Pic("pro/images/game/back-ground.png")
           .scaleTo(stage)
           .center();
 
+        // Nút back
         const button = new Pic("pro/images/game/back.png", 40, 40)
           .pos(15, 8)
           .tap(() => back());
@@ -278,7 +293,7 @@
           .pos(0, 0, LEFT, BOTTOM)
           .addPhysics(false);
 
-        // Thanh máu
+        // Nền thanh máu
         var pattern = pizzazz.makePattern({
           type: "slants",
           colors: series(black, grey),
@@ -287,6 +302,7 @@
           cols: 60,
           interval: 500,
         });
+        // Thanh máu
         var bar = new ProgressBar({
           barType: "Rectangle",
           backing: pattern,
@@ -300,6 +316,7 @@
 
         bar.percent = 100;
 
+        // Icon đầu thanh máu
         const barIcon = new Pic("pro/images/game/lives.svg").pos(
           80,
           55,

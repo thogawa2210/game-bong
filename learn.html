@@ -4,28 +4,197 @@
     <meta charset="utf-8" />
     <title>ZIM - Code Creativity</title>
 
-    <script>
-      const assets = ["back-ground.png"];
-      const path = "/";
-    </script>
+    <script type="text/javascript" src="./zim/createjs.min.js"></script>
+    <script type="text/javascript" src="./zim//zim.min.js"></script>
+    <script type="text/javascript" src="./zim//zim_game.js"></script>
+    <script type="text/javascript" src="./zim//box2d.js"></script>
+    <script type="text/javascript" src="./zim//zim_physics.js"></script>
+    <script type="text/javascript" src="./zim//zim_pizzazz.js"></script>
 
-    <!-- <script
-      type="module"
-      src="https://zimjs.org/cdn/015/zim_pizzazz.js"
-    ></script> -->
-
-    <!-- zimjs.com - JavaScript Canvas Framework -->
     <script type="module">
-      import zim from "https://zimjs.org/cdn/015/zim_pizzazz.js";
-      // See Docs under Frame for FIT, FILL, FULL, and TAG
-      const frame = new Frame(FIT, 340, 680, light, dark, ready);
+      const INITBALL = [
+        "pro/images/game/10-CTG.png",
+        "pro/images/game/9-VPB.png",
+        "pro/images/game/8-VNM.png",
+        "pro/images/game/bomb.png",
+        "pro/images/game/logo.png",
+      ];
+      const INITBALLSZ = [0.04, 0.08, 0.15, 0.3, 0.3];
+      const INITBALLPOS = [570, 570, 555, 570, 570];
+
+      const BALL = [
+        "pro/images/game/10-CTG.png",
+        "pro/images/game/9-VPB.png",
+        "pro/images/game/8-VNM.png",
+        "pro/images/game/7-ACV.png",
+        "pro/images/game/6-HPG.png",
+        "pro/images/game/5-VIC.png",
+        "pro/images/game/4-VHM.png",
+        "pro/images/game/3-GAS.png",
+        "pro/images/game/2-BID.png",
+        "pro/images/game/1-VCB.png",
+      ];
+      const BALLSZ = [
+        0.04, 0.08, 0.15, 0.15, 0.23, 0.21, 0.24, 0.29, 0.3, 0.34,
+      ];
+
+      var physics;
+
+      const frame = new Frame(FIT, 340, 680, "", "", ready);
+      var ON = 0;
+
+      function MakeBall(bar, stage, scorer, bg) {
+        var initball;
+        var ball;
+
+        const randomNum = Math.floor(Math.random() * 101);
+        if (randomNum < 2)
+          // 2%
+          initball = 5;
+        else if (randomNum < 10)
+          // 8%
+          initball = 4;
+        else if (randomNum < 25)
+          // 15%
+          initball = 3;
+        else if (randomNum < 50)
+          // 25%
+          initball = 2;
+        // 50%
+        else initball = 1;
+
+        ball = new Pic(INITBALL[initball - 1])
+          .sca(INITBALLSZ[initball - 1])
+          .center(stage)
+          .pos(0, INITBALLPOS[initball - 1], "center", "bottom");
+
+        ON = 0;
+        // var bd;
+        // if (initball == 1) {
+        //   bd = new Boundary(0, 0, 315, 0);
+        // } else if (initball == 2 || initball == 5 || initball == 4) {
+        //   bd = new Boundary(0, 0, 303, 0);
+        // } else {
+        //   bd = new Boundary(0, 0, 290, 0);
+        // }
+
+        // var motion = new MotionController({
+        //   target: ball,
+        //   type: "pressdrag",
+        //   speed: 20,
+        //   axis: "horizontal",
+        //   boundary: bd,
+        //   mousedownIncludes: bg,
+        // });
+
+        bg.on("click", (e) => {
+          ball
+            .pos(e.stageX, INITBALLPOS[initball - 1], "left", "bottom")
+            .addPhysics({ shape: "circle", restitution: 0.7 })
+            .centerReg()
+            .contact((obj) => {
+              if (
+                (obj.type == "Pic" && obj.file == INITBALL[initball - 1]) ||
+                (obj.type == "Pic" && obj.file == INITBALL[4])
+              ) {
+                scorer.score += 1;
+                if (
+                  scorer.score % 2 == 0 ||
+                  (obj.type == "Pic" && obj.file == INITBALL[4])
+                ) {
+                  const x = obj.x;
+                  const y = obj.y;
+                  if (bar.percent < 100) {
+                    bar.percent += 10;
+                  }
+
+                  if (obj.type == "Pic" && obj.file == INITBALL[4]) {
+                    // logo
+                    scorer.score += 10;
+                    bar.percent = 100;
+                  }
+                  obj.removeFrom();
+                  MakeBall(bar, stage, scorer, bg);
+                } else obj.removeFrom();
+                // Logic bombs
+              } else if (obj.type == "Pic" && initball == 4) {
+                const emitter = new Emitter({
+                  obj: new Rectangle(10, 10, red),
+                  startPaused: true,
+                });
+                emitter.center(stage).loc(obj).spurt(10);
+                obj.removeFrom();
+              }
+            });
+          if (initball != 4) {
+            bar.percent -= 1;
+          }
+          if (bar.percent < 10) {
+            timeout(2, () => {
+              if (bar.percent < 10) {
+                // Bảng thông báo game over
+                const pane = new Pane({
+                  modal: false,
+                  backgroundColor: white,
+                  content: new Label({
+                    color: "#8E8C8A",
+                    text: "Game Over",
+                    backgroundColor: "#EAEAEA",
+                    size: 30,
+                    bold: true,
+                  }),
+                });
+
+                // Nút restart
+                const restart = new Button({
+                  width: 200,
+                  height: 100,
+                  label: "Retry",
+                  backgroundColor: "#EA7C18",
+                  color: white,
+                })
+                  .sca(0.4)
+                  .pos(null, 115, "center", "top", pane)
+                  .tap(() => {
+                    restartGame(bar, stage, scorer, bg);
+                  });
+                pane.show();
+              } else {
+                ON = 1;
+              }
+            });
+          } else {
+            ON = 1;
+          }
+        });
+      }
 
       function ready() {
+        // Cái này là stage?
         const stage = frame.stage;
 
-        // const circle = new Circle().center().drag();
+        // Tạo physics để lát sau xoá khi hết màn
+        physics = new Physics({ frame: frame });
 
-        var pattern = makePattern({
+        // Background
+        const bg = new Pic("pro/images/game/back-ground.png")
+          .scaleTo(stage)
+          .center();
+
+        // Nút back
+        const button = new Pic("pro/images/game/back.png", 40, 40)
+          .pos(15, 8)
+          .tap(() => back());
+
+        // Đáy
+        const rect = new Rectangle(340, 130)
+          .alp(0)
+          .centerReg()
+          .pos(0, 0, LEFT, BOTTOM)
+          .addPhysics(false);
+
+        // Nền thanh máu
+        var pattern = pizzazz.makePattern({
           type: "slants",
           colors: series(black, grey),
           size: 10,
@@ -33,19 +202,44 @@
           cols: 60,
           interval: 500,
         });
+        // Thanh máu
         var bar = new ProgressBar({
           barType: "Rectangle",
           backing: pattern,
           corner: 5,
           width: 300,
+          autoHide: false,
         })
           .sca(0.5)
           .show()
-          .center();
+          .pos(0, 65, "center", "bottom");
 
-        bar.percent = 90;
+        bar.percent = 100;
 
-        const barIcon = new Pic("pro/images/game/lives.svg").pos(80, 0, CENTER, CENTER);
+        // Icon đầu thanh máu
+        const barIcon = new Pic("pro/images/game/lives.svg").pos(
+          80,
+          55,
+          CENTER,
+          BOTTOM
+        );
+
+        // Điểm số
+        const scorer = new Scorer({
+          color: "#95FF6E",
+          backgroundColor: "#3C3934",
+          bold: true,
+        })
+          .sca(0.5)
+          .pos(0, 20, "center", "bottom")
+          .addTo(stage);
+
+        MakeBall(bar, stage, scorer, bg);
+        interval(1, () => {
+          if (ON == 1) {
+            MakeBall(bar, stage, scorer, bg);
+          }
+        });
       }
     </script>
     <meta name="viewport" content="width=device-width, user-scalable=no" />
