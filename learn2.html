@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+
+    <script type="text/javascript" src="./zim/createjs.min.js"></script>
+    <script type="text/javascript" src="./zim//zim.min.js"></script>
+    <script type="text/javascript" src="./zim//zim_game.js"></script>
+    <script type="text/javascript" src="./zim//box2d.js"></script>
+    <script type="text/javascript" src="./zim//zim_physics.js"></script>
+    <script type="text/javascript" src="./zim//zim_pizzazz.js"></script>
+
+    <script type="module">
+      const frame = new Frame(FIT, 340, 680, "", "", ready);
+      var physics;
+
+      function ready() {
+        // Cái này là stage?
+        const stage = frame.stage;
+
+        // Tạo physics để lát sau xoá khi hết màn
+        physics = new Physics({ frame: frame });
+
+        // Background
+        const bg = new Pic("pro/images/game/back-ground.png")
+          .scaleTo(stage)
+          .center();
+
+        // Nút back
+        const button = new Pic("pro/images/game/back.png", 40, 40)
+          .pos(15, 8)
+          .tap(() => back());
+
+        // Đáy
+        const rect = new Rectangle(340, 130)
+          .alp(0)
+          .centerReg()
+          .pos(0, 0, LEFT, BOTTOM)
+          .addPhysics(false);
+
+        // Nền thanh máu
+        var pattern = pizzazz.makePattern({
+          type: "slants",
+          colors: series(black, grey),
+          size: 10,
+          rows: 6,
+          cols: 60,
+          interval: 500,
+        });
+        // Thanh máu
+        var bar = new ProgressBar({
+          barType: "Rectangle",
+          backing: pattern,
+          corner: 5,
+          width: 300,
+          autoHide: false,
+        })
+          .sca(0.5)
+          .show()
+          .pos(0, 65, "center", "bottom");
+
+        bar.percent = 100;
+
+        // Icon đầu thanh máu
+        const barIcon = new Pic("pro/images/game/lives.svg").pos(
+          80,
+          55,
+          CENTER,
+          BOTTOM
+        );
+
+        // Điểm số
+        const scorer = new Scorer({
+          color: "#95FF6E",
+          backgroundColor: "#3C3934",
+          bold: true,
+        })
+          .sca(0.5)
+          .pos(0, 20, "center", "bottom")
+          .addTo(stage);
+        const man = new Rectangle(50, 100, brown).center();
+        // will move man up an down slowly within vertical bounds of stage
+        const swiper = new Swiper(man, man, "y", 0.5, false, 0, H - man.height);
+      }
+    </script>
+  </head>
+  <body></body>
+</html>

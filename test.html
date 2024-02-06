@@ -86,29 +86,11 @@
             .center(stage)
             .pos(null, INITBALLPOS[initball - 1], "center", "bottom");
           ON = 0;
-          var bd;
-          if (initball == 1) {
-            bd = new Boundary(0, 0, 315, 0);
-          } else if (initball == 2 || initball == 5) {
-            bd = new Boundary(0, 0, 303, 0);
-          } else if (initball == 4) {
-            bd = new Boundary(0, 0, 303, 0);
-          } else {
-            bd = new Boundary(0, 0, 290, 0);
-          }
 
-          var motion = new MotionController({
-            target: ball,
-            type: "pressdrag",
-            speed: 20,
-            axis: "horizontal",
-            boundary: bd,
-            mousedownIncludes: bg,
-          });
-          ball.on(
-            "click",
-            (e) => {
-              motion.dispose();
+          const swiper = new zim.Swiper(S, ball, "x", 1, HORIZONTAL, 0, stage.width-ball.width);
+
+          swiper.on("swipestop", (e)=>{
+            swiper.dispose();
               ball
                 .addPhysics({ shape: "circle", restitution: 0.7 })
                 .centerReg(stage)
@@ -193,10 +175,8 @@
               } else {
                 ON = 1;
               }
-            },
-            null,
-            true
-          ); // once : true
+            
+          });
         } else {
           // Logic tạo bóng mới to hơn khi đã chạm nhau
           ball = new Pic(BALL[init])
@@ -317,7 +297,7 @@
         bar.percent = 100;
 
         // Icon đầu thanh máu
-        const barIcon = new Pic("pro/images/game/lives.svg").pos(
+        const barIcon = new Pic("pro/images/game/lives.png").sca(0.33).pos(
           80,
           55,
           CENTER,
