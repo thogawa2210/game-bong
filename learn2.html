@@ -19,36 +19,11 @@
       const login = false;
 
       function endGame(score) {
-        // const pane = new Pane({
-        //   modal: false,
-        //   backgroundColor: white,
-        //   // content: new Label({
-        //   //   color: "#8E8C8A",
-        //   //   text: "Game Over",
-        //   //   backgroundColor: "#EAEAEA",
-        //   //   size: 30,
-        //   //   bold: true,
-        //   // }),
-        //   width: 300,
-        //   height: 400,
-        // });
         const pane = new Pane({
           modal: false,
           backgroundColor: white,
-          content: new Pic("pro/images/game/bg-end.png", 300, 500),
-          width: 300,
-          height: 500,
+          content: new Pic("pro/images/game/bg-end.png").sca(0.9),
         });
-
-        // new Label({
-        //   color: "#8E8C8A",
-        //   text: "Game Over",
-        //   backgroundColor: "#EAEAEA",
-        //   size: 30,
-        //   bold: true,
-        //   lineWidth: 300,
-        //   align: CENTER,
-        // }).pos(null, 20, "center", "top", pane);
 
         if (login) {
           const restart = new Button({
@@ -59,7 +34,7 @@
             color: white,
           })
             .sca(0.4)
-            .pos(null, 340, "center", "top", pane)
+            .pos(null, 300, "center", "top", pane)
             .tap(() => {
               restartGame(bar, stage, scorer, bg);
             });
@@ -73,7 +48,7 @@
             color: white,
           })
             .sca(0.4)
-            .pos(50, 340, "left", "top", pane)
+            .pos(-20, 300, "left", "top", pane)
             .tap(() => {
               restartGame(bar, stage, scorer, bg);
             });
@@ -87,7 +62,7 @@
             color: white,
           })
             .sca(0.4)
-            .pos(50, 340, "right", "top", pane)
+            .pos(-20, 300, "right", "top", pane)
             .tap(() => {
               restartGame(bar, stage, scorer, bg);
             });
