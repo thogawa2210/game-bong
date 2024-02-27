@@ -16,6 +16,79 @@
       const frame = new Frame(FIT, 340, 680, "", "", ready);
       var physics;
 
+      const login = false;
+
+      function endGame(score) {
+        const pane = new Pane({
+          modal: false,
+          backgroundColor: white,
+          // content: new Label({
+          //   color: "#8E8C8A",
+          //   text: "Game Over",
+          //   backgroundColor: "#EAEAEA",
+          //   size: 30,
+          //   bold: true,
+          // }),
+          width: 300,
+          height: 400,
+        });
+
+        new Label({
+          color: "#8E8C8A",
+          text: "Game Over",
+          backgroundColor: "#EAEAEA",
+          size: 30,
+          bold: true,
+          lineWidth: 300,
+          align: CENTER,
+        }).pos(null, 20, "center", "top", pane);
+
+        if (login) {
+          const restart = new Button({
+            width: 200,
+            height: 100,
+            label: "Retry",
+            backgroundColor: "#EA7C18",
+            color: white,
+          })
+            .sca(0.4)
+            .pos(null, 340, "center", "top", pane)
+            .tap(() => {
+              restartGame(bar, stage, scorer, bg);
+            });
+        } else {
+          // Nút Save
+          const restart = new Button({
+            width: 200,
+            height: 100,
+            label: "Save",
+            backgroundColor: "#EA7C18",
+            color: white,
+          })
+            .sca(0.4)
+            .pos(50, 340, "left", "top", pane)
+            .tap(() => {
+              restartGame(bar, stage, scorer, bg);
+            });
+
+          // Nút restart
+          const restart2 = new Button({
+            width: 200,
+            height: 100,
+            label: "Retry",
+            backgroundColor: "#EA7C18",
+            color: white,
+          })
+            .sca(0.4)
+            .pos(50, 340, "right", "top", pane)
+            .tap(() => {
+              restartGame(bar, stage, scorer, bg);
+            });
+        }
+
+        pane.show();
+      }
+
       function ready() {
         // Cái này là stage?
         const stage = frame.stage;
@@ -28,61 +101,7 @@
           .scaleTo(stage)
           .center();
 
-        // Nút back
-        const button = new Pic("pro/images/game/back.png", 40, 40)
-          .pos(15, 8)
-          .tap(() => back());
-
-        // Đáy
-        const rect = new Rectangle(340, 130)
-          .alp(0)
-          .centerReg()
-          .pos(0, 0, LEFT, BOTTOM)
-          .addPhysics(false);
-
-        // Nền thanh máu
-        var pattern = pizzazz.makePattern({
-          type: "slants",
-          colors: series(black, grey),
-          size: 10,
-          rows: 6,
-          cols: 60,
-          interval: 500,
-        });
-        // Thanh máu
-        var bar = new ProgressBar({
-          barType: "Rectangle",
-          backing: pattern,
-          corner: 5,
-          width: 300,
-          autoHide: false,
-        })
-          .sca(0.5)
-          .show()
-          .pos(0, 65, "center", "bottom");
-
-        bar.percent = 100;
-
-        // Icon đầu thanh máu
-        const barIcon = new Pic("pro/images/game/lives.svg").pos(
-          80,
-          55,
-          CENTER,
-          BOTTOM
-        );
-
-        // Điểm số
-        const scorer = new Scorer({
-          color: "#95FF6E",
-          backgroundColor: "#3C3934",
-          bold: true,
-        })
-          .sca(0.5)
-          .pos(0, 20, "center", "bottom")
-          .addTo(stage);
-        const man = new Rectangle(50, 100, brown).center();
-        // will move man up an down slowly within vertical bounds of stage
-        const swiper = new Swiper(man, man, "y", 0.5, false, 0, H - man.height);
+        endGame();
       }
     </script>
   </head>

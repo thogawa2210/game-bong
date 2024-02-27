@@ -12,6 +12,8 @@
     <script type="text/javascript" src="./zim//zim_pizzazz.js"></script>
 
     <script type="module">
+      const isLogin = false;
+
       const INITBALL = [
         "pro/images/game/10-CTG.png",
         "pro/images/game/9-VPB.png",
@@ -19,7 +21,7 @@
         "pro/images/game/bomb.png",
         "pro/images/game/logo.png",
       ];
-      const INITBALLSZ = [0.04, 0.08, 0.15, 0.3, 0.3];
+      const INITBALLSZ = [0.03, 0.065, 0.1, 0.3, 0.3];
       const INITBALLPOS = [570, 570, 555, 570, 570];
 
       const BALL = [
@@ -35,7 +37,7 @@
         "pro/images/game/1-VCB.png",
       ];
       const BALLSZ = [
-        0.04, 0.08, 0.15, 0.15, 0.23, 0.21, 0.24, 0.29, 0.3, 0.34,
+        0.03, 0.065, 0.1, 0.135, 0.17, 0.205, 0.24, 0.275, 0.31, 0.345,
       ];
 
       var physics;
@@ -44,7 +46,6 @@
       var ON = 0;
 
       function restartGame(bar, stage, scorer, bg) {
-        zog(stage.children);
         const ballNumber = stage.children.length - 6;
 
         for (let i = 0; i < ballNumber; i++) {
@@ -87,95 +88,103 @@
             .pos(null, INITBALLPOS[initball - 1], "center", "bottom");
           ON = 0;
 
-          const swiper = new zim.Swiper(S, ball, "x", 1, HORIZONTAL, 0, stage.width-ball.width);
+          const swiper = new zim.Swiper(
+            S,
+            ball,
+            "x",
+            1,
+            HORIZONTAL,
+            0,
+            stage.width - ball.width
+          );
 
-          swiper.on("swipestop", (e)=>{
+          swiper.on("swipestop", (e) => {
             swiper.dispose();
-              ball
-                .addPhysics({ shape: "circle", restitution: 0.7 })
-                .centerReg(stage)
-                .contact((obj) => {
+            ball
+              .addPhysics({ shape: "circle", restitution: 0.7 })
+              .centerReg(stage)
+              .contact((obj) => {
+                if (
+                  // Nếu chạm với quả giống mình hoặc quả logo
+                  (obj.type == "Pic" && obj.file == INITBALL[initball - 1]) ||
+                  (obj.type == "Pic" && obj.file == INITBALL[4])
+                ) {
+                  // Điểm cộng 1
+                  scorer.score += 1;
                   if (
-                    // Nếu chạm với quả giống mình hoặc quả logo
-                    (obj.type == "Pic" && obj.file == INITBALL[initball - 1]) ||
+                    // Nếu điểm chẵn hoặc chạm quả logo
+                    scorer.score % 2 == 0 ||
                     (obj.type == "Pic" && obj.file == INITBALL[4])
                   ) {
-                    // Điểm cộng 1
-                    scorer.score += 1;
-                    if (
-                      // Nếu điểm chẵn hoặc chạm quả logo
-                      scorer.score % 2 == 0 ||
-                      (obj.type == "Pic" && obj.file == INITBALL[4])
-                    ) {
-                      const x = obj.x;
-                      const y = obj.y;
-                      if (bar.percent < 100) {
-                        // Cộng thêm máu nếu máu ko đầy
-                        bar.percent += 10;
-                      }
+                    const x = obj.x;
+                    const y = obj.y;
+                    if (bar.percent < 100) {
+                      // Cộng thêm máu nếu máu ko đầy
+                      bar.percent += 10;
+                    }
 
-                      // Logic đặc biệt khi chạm quả logo
-                      if (obj.type == "Pic" && obj.file == INITBALL[4]) {
-                        // logo
-                        scorer.score += 10;
-                        bar.percent = 100;
-                      }
-                      // Xoá cái chạm vào
-                      obj.removeFrom();
-                      // Tạo quả bóng mới to hơn quả cũ nè
-                      MakeBall(bar, stage, scorer, bg, x, y, initball);
-                    } else obj.removeFrom();
-                    // Logic bombs: Nếu mình là bom và quả kia là Pic
-                  } else if (obj.type == "Pic" && initball == 4) {
-                    const emitter = new Emitter({
-                      obj: new Rectangle(10, 10, red),
-                      startPaused: true,
-                    });
-                    emitter.center(stage).loc(obj).spurt(10);
+                    // Logic đặc biệt khi chạm quả logo
+                    if (obj.type == "Pic" && obj.file == INITBALL[4]) {
+                      // logo
+                      scorer.score += 10;
+                      bar.percent = 100;
+                    }
+                    // Xoá cái chạm vào
                     obj.removeFrom();
-                  }
-                });
-              if (initball != 4) {
-                bar.percent -= 10;
-              }
-              if (bar.percent < 10) {
-                timeout(2, () => {
-                  if (bar.percent < 10) {
-                    // Bảng thông báo game over
-                    const pane = new Pane({
-                      modal: false,
-                      backgroundColor: white,
-                      content: new Label({
-                        color: "#8E8C8A",
-                        text: "Game Over",
-                        backgroundColor: "#EAEAEA",
-                        size: 30,
-                        bold: true,
-                      }),
+                    // Tạo quả bóng mới to hơn quả cũ nè
+                    MakeBall(bar, stage, scorer, bg, x, y, initball);
+                  } else obj.removeFrom();
+                  // Logic bombs: Nếu mình là bom và quả kia là Pic
+                } else if (obj.type == "Pic" && initball == 4) {
+                  const emitter = new Emitter({
+                    obj: new Rectangle(10, 10, red),
+                    startPaused: true,
+                  });
+                  emitter.center(stage).loc(obj).spurt(10);
+                  obj.removeFrom();
+                }
+              });
+            if (initball != 4) {
+              bar.percent -= 20;
+            }
+            if (bar.percent < 10) {
+              timeout(2, () => {
+                if (bar.percent < 10) {
+                  // Bảng thông báo game over
+                  const pane = new Pane({
+                    modal: false,
+                    backgroundColor: white,
+                    content: new Label({
+                      color: "#8E8C8A",
+                      text: "Game Over",
+                      backgroundColor: "#EAEAEA",
+                      size: 30,
+                      bold: true,
+                    }),
+                  });
+
+                  // Nút restart
+                  const restart = new Button({
+                    width: 200,
+                    height: 100,
+                    label: "Retry",
+                    backgroundColor: "#EA7C18",
+                    color: white,
+                  })
+                    .sca(0.4)
+                    .pos(null, 115, "center", "top", pane)
+                    .tap(() => {
+                      restartGame(bar, stage, scorer, bg);
                     });
 
-                    // Nút restart
-                    const restart = new Button({
-                      width: 200,
-                      height: 100,
-                      label: "Retry",
-                      backgroundColor: "#EA7C18",
-                      color: white,
-                    })
-                      .sca(0.4)
-                      .pos(null, 115, "center", "top", pane)
-                      .tap(() => {
-                        restartGame(bar, stage, scorer, bg);
-                      });
-                    pane.show();
-                  } else {
-                    ON = 1;
-                  }
-                });
-              } else {
-                ON = 1;
-              }
-            
+                  pane.show();
+                } else {
+                  ON = 1;
+                }
+              });
+            } else {
+              ON = 1;
+            }
           });
         } else {
           // Logic tạo bóng mới to hơn khi đã chạm nhau
@@ -297,12 +306,9 @@
         bar.percent = 100;
 
         // Icon đầu thanh máu
-        const barIcon = new Pic("pro/images/game/lives.png").sca(0.33).pos(
-          80,
-          55,
-          CENTER,
-          BOTTOM
-        );
+        const barIcon = new Pic("pro/images/game/lives.png")
+          .sca(0.33)
+          .pos(80, 55, CENTER, BOTTOM);
 
         // Điểm số
         const scorer = new Scorer({
