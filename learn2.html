@@ -19,29 +19,36 @@
       const login = false;
 
       function endGame(score) {
+        // const pane = new Pane({
+        //   modal: false,
+        //   backgroundColor: white,
+        //   // content: new Label({
+        //   //   color: "#8E8C8A",
+        //   //   text: "Game Over",
+        //   //   backgroundColor: "#EAEAEA",
+        //   //   size: 30,
+        //   //   bold: true,
+        //   // }),
+        //   width: 300,
+        //   height: 400,
+        // });
         const pane = new Pane({
           modal: false,
           backgroundColor: white,
-          // content: new Label({
-          //   color: "#8E8C8A",
-          //   text: "Game Over",
-          //   backgroundColor: "#EAEAEA",
-          //   size: 30,
-          //   bold: true,
-          // }),
+          content: new Pic("pro/images/game/bg-end.png", 300, 500),
           width: 300,
-          height: 400,
+          height: 500,
         });
 
-        new Label({
-          color: "#8E8C8A",
-          text: "Game Over",
-          backgroundColor: "#EAEAEA",
-          size: 30,
-          bold: true,
-          lineWidth: 300,
-          align: CENTER,
-        }).pos(null, 20, "center", "top", pane);
+        // new Label({
+        //   color: "#8E8C8A",
+        //   text: "Game Over",
+        //   backgroundColor: "#EAEAEA",
+        //   size: 30,
+        //   bold: true,
+        //   lineWidth: 300,
+        //   align: CENTER,
+        // }).pos(null, 20, "center", "top", pane);
 
         if (login) {
           const restart = new Button({
