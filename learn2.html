@@ -18,11 +18,13 @@
 
       const login = false;
 
-      function endGame(score) {
+      function endGame(scorer) {
         const pane = new Pane({
           modal: false,
           backgroundColor: white,
-          content: new Pic("pro/images/game/bg-end.png").sca(0.9),
+          content: new Pic("pro/images/game/bg-end.png").siz(300),
+          width: 300,
+          height: 570,
         });
 
         if (login) {
@@ -34,13 +36,13 @@
             color: white,
           })
             .sca(0.4)
-            .pos(null, 300, "center", "top", pane)
+            .pos(null, 500, "center", "top", pane)
             .tap(() => {
               restartGame(bar, stage, scorer, bg);
             });
         } else {
           // Nút Save
-          const restart = new Button({
+          const save = new Button({
             width: 200,
             height: 100,
             label: "Save",
@@ -48,9 +50,9 @@
             color: white,
           })
             .sca(0.4)
-            .pos(-20, 300, "left", "top", pane)
+            .pos(45, 500, "left", "top", pane)
             .tap(() => {
-              restartGame(bar, stage, scorer, bg);
+              // Sẽ thêm sự kiện login ở đây
             });
 
           // Nút restart
@@ -62,13 +64,20 @@
             color: white,
           })
             .sca(0.4)
-            .pos(-20, 300, "right", "top", pane)
+            .pos(45, 500, "right", "top", pane)
             .tap(() => {
               restartGame(bar, stage, scorer, bg);
             });
         }
 
         pane.show();
+
+        // Hiển thị điểm số
+        new Label({
+          text: Number("12").toLocaleString("en-US"),
+          size: 25,
+          color: "#EA7C18",
+        }).pos(120, 115, "left", "top", pane);
       }
 
       function ready() {

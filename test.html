@@ -61,6 +61,69 @@
       function back() {
         physics.dispose();
       }
+
+      function endGame(bar, stage, scorer, bg) {
+        const pane = new Pane({
+          modal: false,
+          backgroundColor: white,
+          content: new Pic("pro/images/game/bg-end.png").siz(300),
+          width: 300,
+          height: 570,
+        });
+
+        if (isLogin) {
+          const restart = new Button({
+            width: 200,
+            height: 100,
+            label: "Retry",
+            backgroundColor: "#EA7C18",
+            color: white,
+          })
+            .sca(0.4)
+            .pos(null, 500, "center", "top", pane)
+            .tap(() => {
+              restartGame(bar, stage, scorer, bg);
+            });
+        } else {
+          // Nút Save
+          const save = new Button({
+            width: 200,
+            height: 100,
+            label: "Save",
+            backgroundColor: "#EA7C18",
+            color: white,
+          })
+            .sca(0.4)
+            .pos(45, 500, "left", "top", pane)
+            .tap(() => {
+              // Sẽ thêm sự kiện login ở đây
+            });
+
+          // Nút restart
+          const restart2 = new Button({
+            width: 200,
+            height: 100,
+            label: "Retry",
+            backgroundColor: "#EA7C18",
+            color: white,
+          })
+            .sca(0.4)
+            .pos(45, 500, "right", "top", pane)
+            .tap(() => {
+              restartGame(bar, stage, scorer, bg);
+            });
+        }
+
+        pane.show();
+
+        // Hiển thị điểm số
+        new Label({
+          text: Number(scorer.score).toLocaleString("en-US"),
+          size: 25,
+          color: "#EA7C18",
+        }).pos(120, 115, "left", "top", pane);
+      }
+
       // Tạo bóng
       function MakeBall(bar, stage, scorer, bg, x, y, init) {
         var initball;
@@ -151,33 +214,7 @@
               timeout(2, () => {
                 if (bar.percent < 10) {
                   // Bảng thông báo game over
-                  const pane = new Pane({
-                    modal: false,
-                    backgroundColor: white,
-                    content: new Label({
-                      color: "#8E8C8A",
-                      text: "Game Over",
-                      backgroundColor: "#EAEAEA",
-                      size: 30,
-                      bold: true,
-                    }),
-                  });
-
-                  // Nút restart
-                  const restart = new Button({
-                    width: 200,
-                    height: 100,
-                    label: "Retry",
-                    backgroundColor: "#EA7C18",
-                    color: white,
-                  })
-                    .sca(0.4)
-                    .pos(null, 115, "center", "top", pane)
-                    .tap(() => {
-                      restartGame(bar, stage, scorer, bg);
-                    });
-
-                  pane.show();
+                  endGame(bar, stage, scorer, bg);
                 } else {
                   ON = 1;
                 }
@@ -215,24 +252,8 @@
                     const y = obj.y;
                     // Thắng game khi có quả to hơn VCB
                     if (init + 1 == 10) {
-                      const pane2 = new Pane({
-                        width: 320,
-                        modal: false,
-                        backgroundColor: white,
-                        content: new Label({
-                          color: blue,
-                          text: "You Completed!! Game Over",
-                          size: 20,
-                          bold: true,
-                        }),
-                      });
-                      const restart = new Button(200, 100, "Restart", black)
-                        .sca(0.4)
-                        .pos(null, 110, "center", "top", pane2)
-                        .tap(() => {
-                          restartGame(bar, stage, scorer, bg);
-                        });
-                      pane2.show();
+                      // Bảng thông báo game over
+                      endGame(bar, stage, scorer, bg);
                       ON = 0;
                     } else {
                       if (bar.percent < 100) {
